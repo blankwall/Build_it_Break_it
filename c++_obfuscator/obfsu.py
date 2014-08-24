@@ -11,6 +11,8 @@ space_length = 20
 #defines amount of times to dereference the define list
 deref = 20
 
+var_length = 0
+
 syntax = [";", '"',")", "(", " ", ".", "{", "}", "<", ">", ":", "[", "*", "&", "+", ","]
 
 #Add types here as needed
@@ -30,12 +32,14 @@ class file_:
 
 #Change to a dicitionary list rather then ranom characters to make visual analysis harder
 def ran_char():
-	x = randint(0x41, 0x5a);
-	return chr(x)
+	#x = randint(0x41, 0x5a);
+	return ""#chr(x)
 
 def id_generator(size):
-	chars = string.ascii_uppercase + string.digits
-	return ran_char() + ''.join(random.choice(chars) for _ in range(size-1))
+	global var_length
+	var_length += 1
+	#chars = string.ascii_uppercase + string.digits
+	return "_" * var_length #ran_char() + ''.join(random.choice(chars) for _ in range(size-1))
 
 
 #convert stander quotes string to hex representation
