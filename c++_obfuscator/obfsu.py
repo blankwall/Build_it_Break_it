@@ -4,12 +4,16 @@ import string
 import os.path
 import sys
 
-defined = 0
+#defines how long defines are need to add dictionary words instead
 random_length = 5
+#defines max number of spaces 
 space_length = 20
+#defines amount of times to dereference the define list
 deref = 20
 
 syntax = [";", '"',")", "(", " ", ".", "{", "}", "<", ">", ":", "[", "*", "&", "+", ","]
+
+#Add types here as needed
 types = ["int", "class","public", "protected","bool", "static", "void", "const", "unsigned", "<<", "cout", "endl", "return", "while", "if", "for", "else", "length", "c_str","reinterpret_cast"]
 
 
@@ -95,7 +99,7 @@ def safe_replace(line, replace,x, function):
 				line = line.replace(replace, x.types[replace])
 	return line
 
-# MAKE AN ALGO TO MAKE THESE MORE CONFUSING SUCH AS REFERENCING EACH OTHER OR SEPERATING LINES ETC
+# Creating defines needed from the types at the top of the file
 def defines(x):
 	reter = ""
 	new_type = {}
@@ -179,6 +183,7 @@ def parse_code(code, d,x):
 			else:
 				continue
 
+		#pass over includes
 		if len(i) > 0 and i[0] == '#' and not value:
 			final += i
 			final += '\n'
@@ -189,8 +194,6 @@ def parse_code(code, d,x):
 		if value == 1 and defined == 0:
 			i += "\n"
 			final += i
-
-			# for lopo in range(0,deref):
 			final += defines(x)
 			for kooopa in range(deref):
 				final += deref_(x)
@@ -208,6 +211,8 @@ def parse_code(code, d,x):
 			continue
 
 		i = replace_string(i)
+
+		#FIX THIS
 		# i = safe_number(i)
 		for function in x.funcs_:
 			if function in i:
