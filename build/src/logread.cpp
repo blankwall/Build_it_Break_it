@@ -187,7 +187,7 @@ int main(int argc, char **argv) {
     }
     
     if(x == -1){
-        cout <<  SECERR_STR  << endl;
+        cerr <<  SECERR_STR  << endl;
         return -1;
     }
     
