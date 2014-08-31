@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
                     lower2 = optarg;
                 }
                 else{
-                    cerr << INVALID_STR << endl;
+                    cout << INVALID_STR << endl;
                     return -1;
                 }
                 break;
@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
                     upper2 = optarg;
                 }
                 else{
-                    cerr << INVALID_STR << endl;
+                    cout << INVALID_STR << endl;
                     return -1;
                 }
                 break;
@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
                 together = 1;
                 break;
             default:
-                cerr << INVALID_STR << endl;
+                cout << INVALID_STR << endl;
                 return -1;
         }
     }
@@ -94,87 +94,87 @@ int main(int argc, char **argv) {
     string fn = argv[argc-1];
     
     if(fn.empty()){
-        cerr << INVALID_STR<<endl;
+        cout << INVALID_STR<<endl;
         return -1;
     }
     
     //SAFETY CHECKS
     if(fn == lower1 || fn == lower2 || fn == name || fn == key || fn == upper1 || fn == upper2) {
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     
     if( key.empty() || !is_alphanumeric(key)) {
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     
     if((employee && guest)) {
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     
     // ENSURE OPTIONS NOT SELECTED TOGETHER
     if((state && (room || time || together || alist || base))){
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     
     if((room && (time || together || alist || base))){
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     
     if((time && ( together || alist || base))){
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     
     if((together && (alist || base))){
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     if((alist && (base))){
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     
     if(base){
         if(lower1.empty() || lower2.empty() || upper1.empty() || upper2.empty()){
-            cerr << INVALID_STR << endl;
+            cout << INVALID_STR << endl;
             return -1;
         }
     }
     
     if(alist){
         if(lower1.empty() || upper1.empty()){
-            cerr << INVALID_STR << endl;
+            cout << INVALID_STR << endl;
             return -1;
         }
     }
     
     if(room){
         if(!employee && !guest){
-            cerr << INVALID_STR << endl;
+            cout << INVALID_STR << endl;
             return -1;
         }
     }
     
     if(time && html){
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     
     //END CHECKS
     if(!name.empty()){
         if(!is_alpha(name)){
-            cerr << INVALID_STR << endl;
+            cout << INVALID_STR << endl;
             return -1;
         }
     }
     
     if(!is_alphanumeric(key)){
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     
@@ -182,12 +182,12 @@ int main(int argc, char **argv) {
     LogFile lf;
     int x = lf.open(fn, key, true);
     if(!x){
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     
     if(x == -1){
-        cerr << SECERR_STR << endl;
+        cout <<  SECERR_STR  << endl;
         return -1;
     }
     
@@ -207,11 +207,11 @@ int main(int argc, char **argv) {
             string buf = lf.readEntry();
             Entry e;
             if(!Parse::deserialize(buf, &e)) {
-                cerr << INTERR_STR << endl;
+                cout << INTERR_STR << endl;
                 return -1;
             }
             if(!Parse::insert(st, &e)) {
-                cerr << INTERR_STR << endl;
+                cout << INTERR_STR << endl;
                 //cout << e->type;
                 return -1;
             }
@@ -272,11 +272,11 @@ int main(int argc, char **argv) {
         string buf = lf.readEntry();
         Entry e;
         if(!Parse::deserialize(buf, &e)) {
-            cerr << INTERR_STR << endl;
+            cout << INTERR_STR << endl;
             return -1;
         }
         if(!Parse::insert(st, &e)) {
-            cerr << INTERR_STR << endl;
+            cout << INTERR_STR << endl;
             //cout << e->type;
             return -1;
         }

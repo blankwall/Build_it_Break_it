@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
     // ArgParser
     extern char *optarg;
     extern int optind;
-    opterr = 0; 
+    opterr = 0;
     string timestamp="", name="", key="", room="", batch_ ="";
     int c, employee=0, guest=0,arrival=0, leaving=0;
     while ((c = getopt(argc, argv, "AT:K:E:G:LR:B:")) != -1) {
@@ -47,64 +47,64 @@ int main(int argc, char **argv) {
                 batch_ = optarg;
                 break;
             default:
-                cerr << INVALID_STR << endl;
+                cout << INVALID_STR << endl;
                 return -1;
         }
     }
     
     if(!batch_.empty()){
         if(!timestamp.empty() || !key.empty() || !name.empty()||employee||guest||arrival||leaving){
-            cerr << INVALID_STR << endl;
+            cout << INVALID_STR << endl;
             return -1;
         }
         return batch(batch_);
     }
-
+    
     string fn = argv[argc-1];
     if(fn == timestamp || fn == name || fn == key || fn == room) {
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     
     if(timestamp.empty() || key.empty() || name.empty()) {
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     
     if((employee && guest) || (arrival && leaving)) {
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     if(arrival && (!employee && !guest && room.empty())) {
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     
     if(leaving && (!employee && !guest && room.empty())) {
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     
     if(!is_alpha(name)){
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     
     if(!is_alphanumeric(key)){
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
-
-
+    
+    
     LogFile lf;
     int x = lf.open(fn, key, false);
     if(!x){
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     }
     
     if(x == -1){
-        cerr << SECERR_STR << endl;
+        cout <<  SECERR_STR  << endl;
         return -1;
     }
     
@@ -115,11 +115,11 @@ int main(int argc, char **argv) {
         string buf = lf.readEntry();
         Entry e;
         if(!Parse::deserialize(buf, &e)) {
-            cerr << INTERR_STR << endl;
+            cout << INTERR_STR << endl;
             return -1;
         }
         if(!Parse::insert(st, &e)) {
-            cerr << INTERR_STR << endl;
+            cout << INTERR_STR << endl;
             return -1;
         }
     }
@@ -152,9 +152,9 @@ int main(int argc, char **argv) {
             e2.room = strtoul(room.c_str(), NULL, 0);
         }
     }
-
+    
     if(!Parse::insert(st, &e2)) {
-        cerr << INVALID_STR << endl;
+        cout << INVALID_STR << endl;
         return -1;
     } else {
         string logger = Parse::serialize(&e2);
