@@ -20,4 +20,3 @@ test_state.cpp:
 
 test_formatter.cpp:
 	g++ ${CFLAGS} ${FILES} test/test_formatter.cpp -o test_formatter
-
