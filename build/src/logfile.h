@@ -4,6 +4,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <iostream>
 #include <sstream>
 #include <openssl/hmac.h>
 #include <string.h>

@@ -9,6 +9,7 @@
 #include "state.h"
 #include "util.h"
 #include "types.h"
+
 using namespace std;
 
 struct Entry {
@@ -23,7 +24,7 @@ class Parse {
 public:
     static string serialize(const Entry* e);
     static bool deserialize(const string& s, Entry* e);
-    static string delimit(istringstream& stream);
+    static void delimit(istringstream& stream, string& token);
     static bool insert(State& state, Entry* e);
 };
 

@@ -1,6 +1,5 @@
 #include "logfile.h"
 
-#include <iostream>
 using namespace std;
 
 LogFile::LogFile():
@@ -133,6 +132,9 @@ int LogFile::open(const string& fn, const string& sc, bool ro) {
         if(!file) {
             return 0;
         }
+
+        // We want to make sure we write the hmac. Otherwise, we create a corrupted file
+        dirty = true;
 
         // No entries to read, but we have to initialize our crypto helpers ->
     }

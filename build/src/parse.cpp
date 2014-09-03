@@ -27,17 +27,17 @@ bool Parse::deserialize(const string& s, Entry* entry){
     istringstream stream(s);
     int x;
 
-    token = delimit(stream);
+    delimit(stream, token);
     entry->time = strtoul(token.c_str(), NULL, 0);
     
-    token = delimit(stream);
+    delimit(stream, token);
     x = strtol (token.c_str(), NULL, 0);
     entry->room = NO_ROOM;
     if(x >= 0) {
         entry->room = x;
     }
     
-    token = delimit(stream);
+    delimit(stream, token);
     x = strtoul (token.c_str(), NULL, 0);
     if(x == 0) {
         entry->is_employee = false;
@@ -47,14 +47,14 @@ bool Parse::deserialize(const string& s, Entry* entry){
         return false;
     }
     
-    token = delimit(stream);
+    delimit(stream, token);
     x = strtoul (token.c_str(), NULL, 0);
     if(x < 0 || x > 4) {
         return false;
     }
     entry->type = x;
     
-    token = delimit(stream);
+    delimit(stream, token);
     if(token.length() == 0 || !is_alpha(token)) {
         return false;
     }
@@ -63,20 +63,21 @@ bool Parse::deserialize(const string& s, Entry* entry){
     return true;
 }
 
-string Parse::delimit(istringstream& stream){
+void Parse::delimit(istringstream& stream, string& token){
     char inp;
-    string temp = "";
+    token = "";
+
     while(stream >> inp){
         if(inp == ':')
             break;
-        temp += inp;
+        token += inp;
     }
-    return temp;
 }
 
 bool Parse::insert(State& state, Entry *e){
     int x = e->type;
     bool ret = false;
+
     switch (x) {
         case ENTER_GALLERY:
             ret = state.enterGallery(e->time, e->name, e->is_employee);
