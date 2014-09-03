@@ -1,4 +1,4 @@
-CFLAGS=-std=c++11 -I. -O3 -lcrypto -Wno-deprecated-declarations #-Weverything
+CFLAGS=-std=c++11 -I. -Ofast -lcrypto -Wno-deprecated-declarations #-Weverything
 FILES = $(shell for file in `ls src/*.cpp | grep -vE "logread|logappend|batch|main"`;do echo $$file; done)
 
 all: logappend logread
