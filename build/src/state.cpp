@@ -2,10 +2,10 @@
 using namespace std;
 
 Person::Person(const string& name, bool is_employee):
-    name(name), is_employee(is_employee), in_gallery(false), curr_room(NO_ROOM) {}
+name(name), is_employee(is_employee), in_gallery(false), curr_room(NO_ROOM) {}
 
 Room::Room(int room) :
-    room(room) {}
+room(room) {}
 
 void Room::enter(Person* p) {
     p->curr_room = room;
@@ -14,7 +14,7 @@ void Room::enter(Person* p) {
 }
 
 
-//FIXME: Inefficient
+// FIXME: Inefficient
 void Room::exit(Person* p) {
     p->curr_room = NO_ROOM;
     for(vector<Person*>::iterator pit = people.begin(); pit != people.end(); ++pit) {
@@ -28,7 +28,7 @@ void Room::exit(Person* p) {
 }
 
 State::State():
-    last_time(0) {}
+last_time(0) {}
 
 State::~State() {
     for(vector<Person*>::iterator eit = employees.begin(); eit != employees.end(); ++eit) {
@@ -180,6 +180,7 @@ Person* State::getPerson(const string& name, bool is_employee) {
     return nullptr;
 }
 
+// FIXME: Inefficient
 bool State::inGallery(int low, int high, Person* p){
     bool low_bound = false, high_bound = false;
     for (int i = 0; i < p->gallery_times.size(); ++i) {
@@ -187,6 +188,14 @@ bool State::inGallery(int low, int high, Person* p){
             low_bound = true;
         }
         if(p->gallery_times[i] >= low){
+            high_bound = true;
+        }
+    }
+    if(p->in_gallery){
+        if(last_time <= high){
+            low_bound = true;
+        }
+        if(last_time >= low){
             high_bound = true;
         }
     }

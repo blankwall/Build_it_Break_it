@@ -9,9 +9,9 @@
 
 using namespace std;
 
-extern int optind;
 extern char *optarg;
-
+extern int optind;
+extern int opterr;
 
 bool generate_args(int* argc_, char*** argv_, const string& line) {
     char* ctx;
@@ -63,49 +63,73 @@ void cleanup_args(int* argc_, char*** argv_) {
         free( (*argv_)[i] );
     }
     free(*argv_);
+    *argv_ = nullptr;
     *argc_ = 0;
-} 
-
-void print_argcv(int argc, char** argv) {
-    cout << "ARGC: " << argc << ", ARGV {" << endl;
-    for(size_t i = 0; i < argc; ++i) {
-        cout << " " << argv[i] << endl;
-    }
-    cout << "}\n";
 }
 
 int process(int argc, char** argv) {
     optind = 1;
-    string timestamp="", key="", name="", room_id="", fn="";
+    string timestamp="", key="", name="", room="", fn="";
 
     int c;
-    bool employee=false, guest=false, arrival=false, room=false, leaving=false;
+    bool employee=false, guest=false, arrival=false, leaving=false;
+    bool room_b=false, timestamp_b=false, key_b=false, arrival_b=false, leaving_b=false;
     // logappend -T <timestamp> -K <token> (-E <employee-name> | -G <guest-name>) (-A | -L) [-R <room-id>] <log>
     while ((c = getopt(argc, argv, "T:K:E:G:ALR:")) != -1) {
         switch (c) {
             case 'T':
+                if(timestamp_b) {
+                    cout << INVALID_STR << endl;
+                    return -1;
+                }
+                timestamp_b = true;
                 timestamp = optarg;
                 break;
             case 'K':
+                if(key_b) {
+                    cout << INVALID_STR << endl;
+                    return -1;
+                }
+                key_b = true;
                 key = optarg;
                 break;
             case 'E':
+                if(employee) {
+                    cout << INVALID_STR << endl;
+                    return -1;
+                }
                 employee = true;
                 name = optarg;
                 break;
             case 'G':
+                if(guest) {
+                    cout << INVALID_STR << endl;
+                    return -1;
+                }
                 guest = true;
                 name = optarg;
                 break;
             case 'A':
+                if(arrival) {
+                    cout << INVALID_STR << endl;
+                    return -1;
+                }
                 arrival = true;
                 break;
             case 'L':
+                if(leaving) {
+                    cout << INVALID_STR << endl;
+                    return -1;
+                }
                 leaving = true;
                 break;
             case 'R':
-                room = true;
-                room_id = optarg;
+                if (room_b) {
+                    cout << INVALID_STR << endl;
+                    return -1;
+                }
+                room_b = true;
+                room = optarg;
                 break;
             default:
                 cout << INVALID_STR << endl;
@@ -134,7 +158,7 @@ int process(int argc, char** argv) {
     }
 
     // If a room operation, check for a room!
-    if(room && room_id.empty()) {
+    if(room_b && room.empty()) {
         cout << INVALID_STR << endl;
         return -1;
     }
@@ -161,9 +185,22 @@ int process(int argc, char** argv) {
     }
 
     // Ensure room is numeric
-    if(!is_numeric(room_id)) {
+    if(!is_numeric(room)) {
         cout << INVALID_STR << endl;
         return -1;
+    }
+
+    //Check for overflows
+    if(unsigned_overflow(timestamp)){
+        cout << INVALID_STR << endl;
+        return -1;
+    }
+
+    if(room_b){
+        if(signed_overflow(room)){
+            cout << INVALID_STR << endl;
+            return -1;
+        }
     }
 
 
@@ -172,17 +209,17 @@ int process(int argc, char** argv) {
     LogFile lf;
     int x = lf.open(fn, key, false);
     if(!x){
-        cout << INVALID_STR << endl;
+       cout << INVALID_STR << endl;
         return -1;
     }
-    
+
     if(x == -1){
-        cout << SECERR_STR << endl;
+        cerr << SECERR_STR << endl;
         return -1;
     }
-    
+
     State st;
-    
+
     // Update to newest state from log
     while(lf.hasNext()) {
         string buf = lf.readEntry();
@@ -197,7 +234,7 @@ int process(int argc, char** argv) {
         }
     }
 
-    
+
     Entry new_e;
     new_e.time = strtoul(timestamp.c_str(), NULL, 0);
     new_e.room = NO_ROOM;
@@ -207,26 +244,26 @@ int process(int argc, char** argv) {
 
     if (arrival) {
         // Room operation, else gallery operation
-        if(room){
+        if(room_b) {
             new_e.type = ENTER_ROOM;
             // Signed <- Unsigned
-            new_e.room = strtoul(room_id.c_str(), NULL, 0);
+            new_e.room = strtoul(room.c_str(), NULL, 0);
         } else{
             new_e.type = ENTER_GALLERY;
         }
     }
-    
+
     if (leaving) {
         // Room operation, else gallery operation
-        if(room) {
+        if(room_b) {
             new_e.type = LEAVE_ROOM;
             // Signed <- Unsigned
-            new_e.room = strtoul(room_id.c_str(), NULL, 0);
+            new_e.room = strtoul(room.c_str(), NULL, 0);
         } else{
             new_e.type = LEAVE_GALLERY;
         }
     }
-    
+
     if(!Parse::insert(st, &new_e)) {
         cout << INVALID_STR << endl;
         return -1;
@@ -235,7 +272,7 @@ int process(int argc, char** argv) {
         lf.appendEntry(logger);
         lf.close();
     }
-    
+
     return 0;
 }
 
@@ -289,4 +326,3 @@ int main(int argc, char** argv) {
         return process(argc, argv);
     }
 }
-

@@ -41,3 +41,13 @@ bool is_alphanumeric(const string& str) {
     }
     return true;
 }
+
+bool unsigned_overflow(string number){
+    unsigned long int hippo = strtoul(number.c_str(), NULL, 0);
+    return (hippo == ULONG_MAX);
+}
+
+bool signed_overflow(string number){
+    int hippo = strtol(number.c_str(), NULL, 0);
+    return (hippo == LONG_MAX);
+}
