@@ -48,6 +48,6 @@ bool unsigned_overflow(string number){
 }
 
 bool signed_overflow(string number){
-    int hippo = strtol(number.c_str(), NULL, 0);
+    long hippo = strtol(number.c_str(), NULL, 0);
     return (hippo == LONG_MAX);
 }

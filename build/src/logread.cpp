@@ -6,6 +6,7 @@
 #include "util.h"
 #include <unistd.h>
 #include <iostream>
+#include <map>
 
 using namespace std;
 
@@ -14,15 +15,21 @@ extern int optind;
 extern int opterr;
 
 int find_together(LogFile& lf, State& st, vector<string>& names, vector<bool>& types, bool html) {
-    typedef struct room {
-        int peeps;
-        int room;
-    } rooms;
-    
-    vector<rooms*> loop;
-    vector<int> print;
-    
-    int interesting = names.size();
+    map<int,int> room_map;
+    vector<int> interesting_rooms;
+
+    // Make sure there are no duplicates
+    map<string, unsigned int> people_map;
+    for(size_t i = 0; i < names.size(); ++i) {
+        unsigned int interesting_bit = 1 << ((unsigned int)types[i]);
+        if(people_map[names[i]] & interesting_bit) {
+            cout << INVALID_STR <<endl;
+            return -1;
+        }
+        people_map[names[i]] |= interesting_bit;
+    }
+
+    int total_interesting_people = names.size();
     while(lf.hasNext()) {
         string buf = lf.readEntry();
         Entry e;
@@ -34,58 +41,44 @@ int find_together(LogFile& lf, State& st, vector<string>& names, vector<bool>& t
             cout << INTERR_STR << endl;
             return -1;
         }
-        
-        if(e.room == -1)
+
+        // We only care about room events
+        if(e.room == NO_ROOM) {
             continue;
-        int found = 0;
+        }
+
+        // We only care about interesting people
+        bool interesting_person = false;
         for(int i = 0; i < names.size(); ++i){
-            if(e.name == names[i]){
-                found = 1;
+            if(e.is_employee == types[i] && e.name == names[i]) {
+                interesting_person = true;
+                break;
             }
         }
-        if(found){
-            int new_room = 0;
-            for(int zebra = 0; zebra < loop.size(); ++zebra) {
-                if(e.room == loop[zebra]->room) {
-                    Person* p =  st.getPerson(e.name, e.is_employee);
-                    if(p == nullptr) {
-                        return -1;
-                    }
-                    if(p->room_times.size() % 2 != 0){
-                        loop[zebra]->peeps += 1;
-                        if(loop[zebra]->peeps == interesting){
-                            print.push_back(loop[zebra]->room);
-                        }
-                        new_room = 1;
-                    }
-                    else {
-                        loop[zebra]->peeps -= 1;
-                        new_room = 1;
-                    }
-                }
-            }
-            if(!new_room){
-                rooms* temp = new rooms;
-                temp->peeps = 1;
-                temp->room = e.room;
-                loop.push_back(temp);
-                if(interesting == 1){
-                    print.push_back(temp->room);
-                }
-            }
+
+        if(!interesting_person) {
+            continue;
         }
-    }
-    // for(int i =0; i < print.size(); ++i){
-    //     cout << print[i] << endl;
-    // }
-    sort(print.begin(), print.end());
+
+        // Look for the room
+        int delta = e.type == ENTER_ROOM ? 1:-1;
+        room_map[e.room] += delta;
+
+        if(room_map[e.room] == total_interesting_people) {
+            interesting_rooms.push_back(e.room);
+        }
+    } // while end
+
+    sort(interesting_rooms.begin(), interesting_rooms.end());
+
     Formatter* fmt;
     if(html) {
         fmt = new Html();
     } else {
         fmt = new Plain();
     }
-    fmt->printRoomVector(print);
+    fmt->printRoomVector(interesting_rooms);
+    
     delete fmt;
     return 0;
 }
@@ -293,12 +286,12 @@ int main(int argc, char **argv) {
         upper1_u = strtoul(upper1.c_str(), NULL, 0);
 
         //Check for overflows
-        if(unsigned_overflow(lower1) || unsigned_overflow(upper1)){
+        if(unsigned_overflow(lower1) || unsigned_overflow(upper1)) {
             cout << INVALID_STR << endl;
             return -1;
         }
 
-        if(!is_numeric(lower1) || !is_numeric(upper1) || lower1_u > upper1_u) {
+        if(!is_numeric(lower1) || !is_numeric(upper1) || lower1_u >= upper1_u) {
             cout << INVALID_STR << endl;
             return -1;
         }
@@ -315,7 +308,7 @@ int main(int argc, char **argv) {
             return -1;
         }
 
-        if(!is_numeric(lower2) || !is_numeric(upper2) || lower2 > upper2) {
+        if(!is_numeric(lower2) || !is_numeric(upper2) || lower2 >= upper2) {
             cout << INVALID_STR << endl;
             return -1;
         }
