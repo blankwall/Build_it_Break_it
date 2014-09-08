@@ -157,6 +157,11 @@ int LogFile::open(const string& fn, const string& sc, bool ro) {
     streampos i = 0;
     char file_buf[CHUNK_SZ];
 
+    // Preallocate space
+    data.seekp(sz);
+    data.write("", 0);
+    data.seekp(0);
+
     while (i < sz) {
         size_t chunk_sz = i + CHUNK_SZ < sz ? CHUNK_SZ:sz - i;
         file.read(file_buf, chunk_sz);
