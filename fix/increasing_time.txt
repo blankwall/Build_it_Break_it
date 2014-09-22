@@ -1,0 +1,11 @@
+All four of these tests are malformed in some way, so that running them on a correct implementation would still show fails.
+
+766, 748:
+    Second command should return invalid, -1
+    Third command should return pppp (Since the first insertion was valid)
+
+753:
+    Second command should return invalid, -1
+
+388:
+    None of the commands specify a logfile...
