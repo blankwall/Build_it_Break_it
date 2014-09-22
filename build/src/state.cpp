@@ -44,7 +44,7 @@ State::~State() {
 
 // Set Persons gallery field to True : Must not have already entered gallery
 bool State::enterGallery(unsigned int time, const string& name, bool is_employee) {
-    if(time < last_time) {
+    if(time <= last_time) {
         return false;
     }
     // No rejoining the gallery
@@ -62,7 +62,7 @@ bool State::enterGallery(unsigned int time, const string& name, bool is_employee
 
 // Set Persons gallery field to False : Must leave room before exiting gallery
 bool State::exitGallery(unsigned int time, const string& name, bool is_employee) {
-    if(time < last_time) {
+    if(time <= last_time) {
         return false;
     }
     Person* p = getPerson(name, is_employee);
@@ -82,7 +82,7 @@ bool State::exitGallery(unsigned int time, const string& name, bool is_employee)
 }
 
 bool State::enterRoom(unsigned int time, const string& name, bool is_employee, int room) {
-    if(time < last_time) {
+    if(time <= last_time) {
         return false;
     }
     Person* p = getPerson(name, is_employee);
@@ -111,7 +111,7 @@ bool State::enterRoom(unsigned int time, const string& name, bool is_employee, i
 
 // Can only leave current room
 bool State::exitRoom(unsigned int time, const string& name, bool is_employee, int room) {
-    if(time < last_time) {
+    if(time <= last_time) {
         return false;
     }
     Person* p = getPerson(name, is_employee);
