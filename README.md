@@ -5,4 +5,4 @@ This is our contest submission for the Fall 2014 Build It Break It Fix It compet
 
 Authors:
 
-Blankwall Kiwi Ancat Coldheat
+Blankwall Kiwi
